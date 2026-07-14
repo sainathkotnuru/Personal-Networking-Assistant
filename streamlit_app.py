@@ -1,15 +1,31 @@
-import json
+import os
 from datetime import datetime
 from typing import List
 
 import requests
 import streamlit as st
 
-API_BASE_URL = "http://127.0.0.1:8000"
+from app.services.event_analyzer import EventAnalyzer
+from app.services.fact_checker import FactChecker
+from app.services.feedback_manager import FeedbackManager
+from app.services.history_manager import HistoryManager
+from app.services.topic_generator import TopicGenerator
+
+API_BASE_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:8000")
+USE_LOCAL_SERVICES = os.getenv("USE_LOCAL_SERVICES", "true").lower() in {"1", "true", "yes", "on"}
+
+analyzer = EventAnalyzer()
+generator = TopicGenerator()
+checker = FactChecker()
+history_manager = HistoryManager()
+feedback_manager = FeedbackManager()
 
 
 def fetch_history() -> List[dict]:
-    response = requests.get(f"{API_BASE_URL}/history")
+    if USE_LOCAL_SERVICES:
+        return history_manager.load_history()
+
+    response = requests.get(f"{API_BASE_URL}/history", timeout=10)
     if response.status_code == 200:
         return response.json()
     return []
@@ -63,20 +79,35 @@ def build_full_report(event_name: str, description: str, themes: List[str], conv
 
 
 def analyze_event(event_name: str, description: str) -> dict:
+    if USE_LOCAL_SERVICES:
+        return {"event_name": event_name, "themes": analyzer.extract_themes(description)}
+
     payload = {"event_name": event_name, "description": description}
-    response = requests.post(f"{API_BASE_URL}/analyze-event", json=payload)
+    response = requests.post(f"{API_BASE_URL}/analyze-event", json=payload, timeout=10)
     return response.json() if response.status_code == 200 else {"themes": []}
 
 
 def generate_conversation(event_name: str, themes: List[str]) -> dict:
+    if USE_LOCAL_SERVICES:
+        return {
+            "event_name": event_name,
+            "themes": themes,
+            "starters": generator.generate_conversation_starters(themes),
+            "follow_up_questions": generator.generate_follow_up_questions(themes),
+            "suggestions": generator.generate_networking_suggestions(themes),
+        }
+
     payload = {"event_name": event_name, "themes": themes}
-    response = requests.post(f"{API_BASE_URL}/generate-conversation", json=payload)
+    response = requests.post(f"{API_BASE_URL}/generate-conversation", json=payload, timeout=10)
     return response.json() if response.status_code == 200 else {}
 
 
 def fact_check(topic: str) -> dict:
+    if USE_LOCAL_SERVICES:
+        return checker.verify_topic(topic)
+
     payload = {"topic": topic}
-    response = requests.post(f"{API_BASE_URL}/fact-check", json=payload)
+    response = requests.post(f"{API_BASE_URL}/fact-check", json=payload, timeout=10)
     return response.json() if response.status_code == 200 else {}
 
 
@@ -85,8 +116,11 @@ def fact_check_themes(themes: List[str]) -> List[dict]:
 
 
 def submit_feedback(conversation_id: str, rating: int, comment: str) -> dict:
+    if USE_LOCAL_SERVICES:
+        return feedback_manager.store_feedback(conversation_id, rating, comment)
+
     payload = {"conversation_id": conversation_id, "rating": rating, "comment": comment}
-    response = requests.post(f"{API_BASE_URL}/feedback", json=payload)
+    response = requests.post(f"{API_BASE_URL}/feedback", json=payload, timeout=10)
     return response.json() if response.status_code == 200 else {}
 
 
