@@ -94,6 +94,16 @@ pytest -v
 
 FastAPI listens on `http://127.0.0.1:8000`, and Streamlit uses the API to load and save data.
 
+## Demo
+
+A quick demo flow is available in [demo/README.md](demo/README.md).
+
+You can showcase the application by:
+1. Running the app locally or using the deployed URL.
+2. Entering an event name and description.
+3. Clicking "Analyze Event" and then "Generate Conversation Starters".
+4. Reviewing the generated themes, conversation starters, and fact checks.
+
 ## Future Scope
 
 - Add authentication and user accounts
