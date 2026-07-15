@@ -48,16 +48,21 @@ The application analyzes event descriptions using DistilBERT, extracts important
 
 ## Folder Structure
 
-- `app/`
-  - `main.py` - FastAPI application entrypoint
-  - `models/schemas.py` - Pydantic request and response models
-  - `services/` - core AI and storage modules
-    - `event_analyzer.py`
-    - `topic_generator.py`
-    - `fact_checker.py`
-    - `history_manager.py`
-    - `feedback_manager.py`
-  - `storage/` - local JSON data files
+The project is now organized in a SmartBridge-style academic project layout while keeping the same application topic:
+
+- `1. Brainstorming & Ideation/` - project idea and concept notes
+- `2. Requirement Analysis/` - requirements and scope documentation
+- `3. Project Design Phase/` - architecture and design documentation
+- `4. Project Planning Phase/` - development planning notes
+- `5. Project Development Phase/` - implementation overview and milestones
+- `6. Project Testing/` - testing and validation notes
+- `7. Project Documentation/` - documentation references
+- `8. Project Demonstration/` - demo and showcase materials
+- `Assets/` - visuals and screenshot assets
+- `Sample Audio/` - sample testing media
+- `Sample Reports/` - example output reports
+- `Source_Code/` - code workspace organizing `src/`, `data/`, `docs/`, and `reports/`
+- `app/` - existing FastAPI application package
 - `tests/` - unit tests for modules and APIs
 - `streamlit_app.py` - Streamlit frontend UI
 - `requirements.txt` - Python dependencies
